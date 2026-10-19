@@ -1,6 +1,3 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
-
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
 import Button from "../../ui/Button";
@@ -9,60 +6,55 @@ import Textarea from "../../ui/Textarea";
 import FormRow from "../../ui/FormRow";
 
 import { useForm } from "react-hook-form";
-import { createEditCabin } from "../../services/apiCabins";
+import { useCreateCabin } from "./useCreateCabin";
+import { useEditCabin } from "./useEditCabin";
 
 // Ako je u pitanju kreiranje, cabinToEdit je prazan objekat {}, pa je editId "undefined" a editValues prazan objekat {}.
 // Razdvojili smo cabinToEdit na editId i editValues, jer nam je editId potreban da bismo znali da li je u pitanju kreiranje ili editovanje
 // Boolean(...) pretvara bilo koju vrednost u true ili false, prema tome da li je “truthy” ili “falsy”. Vrednost undefined je falsy.
 function CreateCabinForm({cabinToEdit = {}, setShowForm}) {
+  const  {isCreating, createCabin} = useCreateCabin();
+  const {isEditing, editCabin} = useEditCabin();
+  const isWorking = isCreating || isEditing;
   const {id: editId, ...editValues} = cabinToEdit;
   const isEditSession = Boolean(editId);
   const {register, handleSubmit, reset, formState, getValues } = useForm({
     defaultValues: isEditSession ? editValues : {}
   });
   const { errors } = formState;
-  const queryClient = useQueryClient();
 
-  const {mutate: createCabin, isPending: isCreating} = useMutation({
-    mutationFn: newCabin => createEditCabin(newCabin),
-    onSuccess: () => {
-      toast.success("Cabin successfully created/edited");
-      queryClient.invalidateQueries({ queryKey: ["cabins"] });
-      reset();
-    },
-    onError: (err) => toast.error(err.message)
-  })
+  
 
-  const {mutate: editCabin, isPending: isEditing} = useMutation({
-    // ova fja unutar mutationFn moze da primi samo JEDAN argument(zato smo stavili OBJEKAT)
-    mutationFn: ({newCabinData, id}) => createEditCabin(newCabinData, id),
-    onSuccess: () => {
-      toast.success("Cabin successfully edited");
-      queryClient.invalidateQueries({ queryKey: ["cabins"] });
-      reset();
-    },
-    onError: (err) => toast.error(err.message)
-  })
-
-  const isWorking = isCreating || isEditing;
-
-  function onSubmit(data) {
-    // console.log("data:", data);
+  function onSubmittt(data) {
+    // ako je "string" onda je data.image is defaultValues pri editovanju: 
     const image = typeof data.image === "string" ? data.image : data.image[0];
-    if(isEditSession) editCabin({newCabinData: {...data, image}, id: editId});
-    else createCabin({...data, image: image});
+    if(isEditSession) editCabin(
+      {newCabinData: {...data, image}, id: editId},
+      {
+        onSuccess: () => { 
+          reset();
+        },  
+      }
+    );
+    else createCabin(
+      {...data, image: image},
+      {
+        onSuccess: () => { 
+          reset();
+        },  
+      }
+    ),
     setTimeout(() => {
         setShowForm?.(false);
-      }, 3000);
-    
+    }, 3000);
   }
 
-  function onError(errors) {
+  function onErrorrr(errors) {
     console.log(errors);
   }
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit, onError)}>
+    <Form onSubmit={handleSubmit(onSubmittt, onErrorrr)}>
       <FormRow label="Cabin name" error={errors?.name?.message}>
         <Input type="text" id="name" disabled={isWorking} {...register("name", { 
           required: "This field is required" 
@@ -93,7 +85,7 @@ function CreateCabinForm({cabinToEdit = {}, setShowForm}) {
 
       <FormRow label="Discount" error={errors?.discount?.message}>
         <Input type="number" id="discount" defaultValue={0} disabled={isWorking} {...register("discount", { 
-          required: "This field is required", 
+          setValueAs: (value) => (value === "" ? 0 : Number(value)),
           validate: (value) => Number(value) <= Number(getValues("regularPrice")) || "Discount must be less than or equal to regular price"
         })} />
       </FormRow>
