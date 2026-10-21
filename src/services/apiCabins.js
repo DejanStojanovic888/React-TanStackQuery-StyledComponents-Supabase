@@ -31,6 +31,7 @@ export async function createEditCabin(newCabin, id) {
         throw new Error('Cabin could not be created');
     }
     // 3. Upload image(ovo se izvrsava samo ako nema errora u kreiranju kabine u bazi):
+    if(hasImagePath) return data; // ako vec postoji imagePath, onda ostavljamo stari image(sprecavamo da se uploaduje u Storage novi image)
     const { error: storageError } = await supabase.storage
         .from('cabin-images')
         .upload(imageName, newCabin.image)  // newCabin.image je File objekat koji je uploadovan na Supabase storage

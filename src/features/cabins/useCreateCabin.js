@@ -9,10 +9,10 @@ export function useCreateCabin() {
     const {mutate: createCabin, isPending: isCreating } = useMutation({
         mutationFn: newCabin => createEditCabin(newCabin),
         onSuccess: () => {
-            toast.success("Cabin successfully created/edited");
+            toast.success("Cabin successfully created");
             queryClient.invalidateQueries({ queryKey: ["cabins"] });
         },
         onError: (err) => toast.error(err.message)
     })
-    return {createCabin, isCreating };
+    return { createCabin, isCreating };
 }
