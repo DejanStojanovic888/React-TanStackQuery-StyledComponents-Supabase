@@ -1,4 +1,4 @@
-import { cloneElement, createContext, useContext, useState } from "react";
+import { cloneElement, createContext, useContext, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { HiXMark } from "react-icons/hi2";
 import styled from "styled-components";
@@ -71,12 +71,35 @@ function Open({children, opens: opensWindowName}) {
   return cloneElement(children, { onClick: () => open(opensWindowName) })
 }
 
+// 1. CAPTURE faza:  document → ... → roditelji → dugme   (od vrha ka cilju)
+// 2. BUBBLING faza: dugme → roditelji → ... → document   (od cilja ka vrhu)
+// Po defaultu (false) listener radi u bubbling fazi, a sa true u capture fazi, dakle pre svih ostalih.
 function Window({children, name}) {
   const {openName, close} = useContext(ModalContext);
+  const ref = useRef();
+
+  useEffect(
+    function() {
+      function handleClick(e) {
+        // ref.current nam je uvek <StyledModal ref={ref}> jer smo u njega ubacili ref
+        // ref.current je undefined kada god mozemo da kliknemo na Add new cabin jer tada Modal.Window ne postoji u DOM-u
+        // zato se ne gasi Modal.Window milisekundu nakon otvaranja kada kliknemo Add new cabin dugme
+        if(ref.current && !ref.current.contains(e.target)) {
+          console.log('click outside detected');
+          close();
+        }
+      }
+      document.addEventListener('click', handleClick, true);
+      return () => document.removeEventListener('click', handleClick, true);
+    },
+    [close]
+  )
+
+
   if(name !== openName) return null;
   return createPortal( 
     <Overlay>
-      <StyledModal>
+      <StyledModal ref={ref}>
         <Button onClick={close}>
           <HiXMark />
         </Button>
