@@ -12,7 +12,7 @@ import { useEditCabin } from "./useEditCabin";
 // Ako je u pitanju kreiranje, cabinToEdit je prazan objekat {}, pa je editId "undefined" a editValues prazan objekat {}.
 // Razdvojili smo cabinToEdit na editId i editValues, jer nam je editId potreban da bismo znali da li je u pitanju kreiranje ili editovanje
 // Boolean(...) pretvara bilo koju vrednost u true ili false, prema tome da li je “truthy” ili “falsy”. Vrednost undefined je falsy.
-function CreateCabinForm({cabinToEdit = {}, setShowForm}) {
+function CreateCabinForm({ cabinToEdit = {}, onCloseModal, setShowForm }) {
   const  {isCreating, createCabin} = useCreateCabin();
   const {isEditing, editCabin} = useEditCabin();
   const isWorking = isCreating || isEditing;
@@ -33,6 +33,7 @@ function CreateCabinForm({cabinToEdit = {}, setShowForm}) {
       {
         onSuccess: () => { 
           reset();
+          onCloseModal?.();
         },  
       }
     );
@@ -41,6 +42,7 @@ function CreateCabinForm({cabinToEdit = {}, setShowForm}) {
       {
         onSuccess: () => { 
           reset();
+          onCloseModal?.();
         },  
       }
     ),
@@ -54,7 +56,7 @@ function CreateCabinForm({cabinToEdit = {}, setShowForm}) {
   }
 
   return (
-    <Form onSubmit={handleSubmit(onSubmittt, onErrorrr)}>
+    <Form onSubmit={handleSubmit(onSubmittt, onErrorrr)} type={onCloseModal ? "modal" : "regular"}>
       <FormRow label="Cabin name" error={errors?.name?.message}>
         <Input type="text" id="name" disabled={isWorking} {...register("name", { 
           required: "This field is required" 
@@ -104,8 +106,9 @@ function CreateCabinForm({cabinToEdit = {}, setShowForm}) {
       </FormRow>
 
       <FormRow>
-        {/* type is an HTML attribute! */}
-        <Button variation="secondary" type="reset">
+        {/* type is an HTML attribute!  browser automatski vraća sva polja unutar te <form> na njihove početne (inicijalne) vrednosti — to jest na vrednosti koje su imale u trenutku kada se forma prvi put učitala.*/}
+        {/* nekad imamo onCloseModal a nekada nemamo zato ide optional chaining(?.)  Na primer u AddCabin.jsx imamo taj prop onCloseModal */}
+        <Button variation="secondary" type="reset" onClick={() => onCloseModal?.()}>
           Cancel
         </Button>
         <Button disabled={isWorking}>
