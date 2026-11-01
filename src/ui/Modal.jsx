@@ -71,9 +71,18 @@ function Open({children, opens: opensWindowName}) {
   return cloneElement(children, { onClick: () => open(opensWindowName) })
 }
 
+
 // 1. CAPTURE faza:  document → ... → roditelji → dugme   (od vrha ka cilju)
 // 2. BUBBLING faza: dugme → roditelji → ... → document   (od cilja ka vrhu)
 // Po defaultu (false) listener radi u bubbling fazi, a sa true u capture fazi, dakle pre svih ostalih.
+
+// Običan onClick je vezan za bubbling, a za capture postoji poseban prop.
+// Dva propa za isti događaj
+// React prop	Faza
+// onClick	bubbling
+// onClickCapture	capture
+
+//  uvek se odradi prvo capture faza pa tek onda bubbling faza pri svakom eventu
 function Window({children, name}) {
   const {openName, close} = useContext(ModalContext);
   const ref = useRef();
@@ -83,7 +92,7 @@ function Window({children, name}) {
       function handleClick(e) {
         // ref.current nam je uvek <StyledModal ref={ref}> jer smo u njega ubacili ref
         // ref.current je undefined kada god mozemo da kliknemo na Add new cabin jer tada Modal.Window ne postoji u DOM-u
-        // zato se ne gasi Modal.Window milisekundu nakon otvaranja kada kliknemo Add new cabin dugme
+        // Gasi se Modal.Window milisekundu nakon otvaranja kada kliknemo Add new cabin dugme ako je bubbling(sto ovde nije slucaj)
         if(ref.current && !ref.current.contains(e.target)) {
           console.log('click outside detected');
           close();
