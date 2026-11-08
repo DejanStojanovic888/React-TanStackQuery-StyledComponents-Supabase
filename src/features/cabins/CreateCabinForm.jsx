@@ -12,7 +12,7 @@ import { useEditCabin } from "./useEditCabin";
 // Ako je u pitanju kreiranje, cabinToEdit je prazan objekat {}, pa je editId "undefined" a editValues prazan objekat {}.
 // Razdvojili smo cabinToEdit na editId i editValues, jer nam je editId potreban da bismo znali da li je u pitanju kreiranje ili editovanje
 // Boolean(...) pretvara bilo koju vrednost u true ili false, prema tome da li je “truthy” ili “falsy”. Vrednost undefined je falsy.
-function CreateCabinForm({ cabinToEdit = {}, onCloseModal, setShowForm }) {
+function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
   const  {isCreating, createCabin} = useCreateCabin();
   const {isEditing, editCabin} = useEditCabin();
   const isWorking = isCreating || isEditing;
@@ -45,10 +45,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal, setShowForm }) {
           onCloseModal?.();
         },  
       }
-    ),
-    setTimeout(() => {
-        setShowForm?.(false);
-    }, 3000);
+    )
   }
 
   function onErrorrr(errors) {

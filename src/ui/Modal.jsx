@@ -1,7 +1,8 @@
-import { cloneElement, createContext, useContext, useEffect, useRef, useState } from "react";
+import { cloneElement, createContext, useContext, useState } from "react";
 import { createPortal } from "react-dom";
 import { HiXMark } from "react-icons/hi2";
 import styled from "styled-components";
+import { useOutsideClick } from "../hooks/useOutsideClick";
 
 const StyledModal = styled.div`
   position: fixed;
@@ -71,7 +72,6 @@ function Open({children, opens: opensWindowName}) {
   return cloneElement(children, { onClick: () => open(opensWindowName) })
 }
 
-
 // 1. CAPTURE faza:  document → ... → roditelji → dugme   (od vrha ka cilju)
 // 2. BUBBLING faza: dugme → roditelji → ... → document   (od cilja ka vrhu)
 // Po defaultu (false) listener radi u bubbling fazi, a sa true u capture fazi, dakle pre svih ostalih.
@@ -85,25 +85,7 @@ function Open({children, opens: opensWindowName}) {
 //  uvek se odradi prvo capture faza pa tek onda bubbling faza pri svakom eventu
 function Window({children, name}) {
   const {openName, close} = useContext(ModalContext);
-  const ref = useRef();
-
-  useEffect(
-    function() {
-      function handleClick(e) {
-        // ref.current nam je uvek <StyledModal ref={ref}> jer smo u njega ubacili ref
-        // ref.current je undefined kada god mozemo da kliknemo na Add new cabin jer tada Modal.Window ne postoji u DOM-u
-        // Gasi se Modal.Window milisekundu nakon otvaranja kada kliknemo Add new cabin dugme ako je bubbling(sto ovde nije slucaj)
-        if(ref.current && !ref.current.contains(e.target)) {
-          console.log('click outside detected');
-          close();
-        }
-      }
-      document.addEventListener('click', handleClick, true);
-      return () => document.removeEventListener('click', handleClick, true);
-    },
-    [close]
-  )
-
+  const ref = useOutsideClick(close); 
 
   if(name !== openName) return null;
   return createPortal( 
