@@ -72,17 +72,6 @@ function Open({children, opens: opensWindowName}) {
   return cloneElement(children, { onClick: () => open(opensWindowName) })
 }
 
-// 1. CAPTURE faza:  document → ... → roditelji → dugme   (od vrha ka cilju)
-// 2. BUBBLING faza: dugme → roditelji → ... → document   (od cilja ka vrhu)
-// Po defaultu (false) listener radi u bubbling fazi, a sa true u capture fazi, dakle pre svih ostalih.
-
-// Običan onClick je vezan za bubbling, a za capture postoji poseban prop.
-// Dva propa za isti događaj
-// React prop	Faza
-// onClick	bubbling
-// onClickCapture	capture
-
-//  uvek se odradi prvo capture faza pa tek onda bubbling faza pri svakom eventu
 function Window({children, name}) {
   const {openName, close} = useContext(ModalContext);
   const ref = useOutsideClick(close); 

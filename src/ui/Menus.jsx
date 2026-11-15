@@ -66,6 +66,7 @@ const StyledButton = styled.button`
 `;
 
 const MenusContext = createContext();
+
 function Menus({ children }) {
   const [openId, setOpenId] = useState('');
   const [position, setPosition] = useState(null);
@@ -82,7 +83,7 @@ function Toggle({ id }) {
   const { openId, close, open, setPosition } = useContext(MenusContext);
   function handleClick(e) {
     const rect = e.target.closest('button').getBoundingClientRect();
-    // setPosition je fja koja postavlja poziciju one 3 vertikalne tacke u state 
+    // setPosition je fja koja postavlja poziciju modala za one 3 vertikalne tacke u state 
     setPosition({ 
       x: window.innerWidth - rect.width - rect.x,
       y: rect.y + rect.height + 8 
@@ -105,7 +106,10 @@ function List({ id, children }) {
   )
 }
 
-function Button({ children, onClick, icon }) {
+// Modal.Open ubacuje AUTOMATSKI POPUNJEN onClick prop(ne trebamo mi da ubacujemo vrednost) u svoj child element!
+// Zato smo morali da ubacimo onClick prop u Button
+// Ovaj close() zatvara  listu menija (tri tačke).Postoji takodje close() fja u ModalContext-u koja nema veze sa ovom)
+function Button({ children, onClick, icon, ...props }) {
   const {close} = useContext(MenusContext);
   function handleClick() {
     onClick?.();
@@ -113,7 +117,7 @@ function Button({ children, onClick, icon }) {
   }
   return (
     <li>
-      <StyledButton onClick={handleClick}>
+      <StyledButton onClick={handleClick} {...props}>
         {icon}<span>{children}</span>
       </StyledButton>
     </li>

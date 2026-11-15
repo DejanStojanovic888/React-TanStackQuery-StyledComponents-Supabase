@@ -66,17 +66,19 @@ function CabinRow({ cabin }) {
       <Cabin>{name}</Cabin>
       <div>Fits up to {maxCapacity} guests</div>
       <Price>{formatCurrency(regularPrice)}</Price>
-      {discount ? (<Discount>{formatCurrency(discount)}</Discount>) : (<div>&mdash;</div>)}
+      {discount ? (<Discount>{formatCurrency(discount)}</Discount>) : (<span>&mdash;</span>)}
+
+      {/* // Modal.Open automatski ubacuje POPUNJEN onClick prop(ne trebamo mi da ubacujemo vrednost) u svoj child element! */}
+      {/* Pravi provider je Menus (funkcija sa MenusContext.Provider), i on se stavlja oko cele tabele, tj. u CabinTable.jsx */}
       <div>
         <Modal>
           <Menus.Menu>
-            
             <Menus.Toggle id={cabinId} />
 
             <Menus.List id={cabinId}>
-              <Menus.Button icon={<HiSquare2Stack />} onClick={handleDuplicate} >Duplicate</Menus.Button>
+              <Menus.Button icon={<HiSquare2Stack />} onClick={handleDuplicate}  disabled={isCreating}>Duplicate</Menus.Button>
               <Modal.Open opens='edit'>
-                <Menus.Button disabled={isCreating} icon={<HiPencil />}>Edit</Menus.Button>
+                <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
               </Modal.Open>
               <Modal.Open opens='delete'>
                 <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>

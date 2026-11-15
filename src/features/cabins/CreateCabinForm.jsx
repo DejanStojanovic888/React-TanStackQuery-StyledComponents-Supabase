@@ -26,8 +26,9 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
   
 
   function onSubmittt(data) {
-    // ako je "string" onda je data.image is defaultValues pri editovanju: 
-    const image = typeof data.image === "string" ? data.image : data.image[0];
+    const image = typeof data.image === "string"
+      ? data.image
+      : data.image?.[0] || editValues.image;
     if(isEditSession) editCabin(
       {newCabinData: {...data, image}, id: editId},
       {
