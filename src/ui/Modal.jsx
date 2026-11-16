@@ -54,7 +54,7 @@ const Button = styled.button`
 `;
 
 const ModalContext = createContext();
-
+// koristimo u AddCabin i CabinRow ovaj Modal.jsx:
 function Modal({children}) {
   const [openName, setOpenName] = useState('');
   const close = () => setOpenName('');

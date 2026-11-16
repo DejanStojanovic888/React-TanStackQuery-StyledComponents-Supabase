@@ -112,11 +112,13 @@ function List({ id, children }) {
 function Button({ children, onClick, icon, ...props }) {
   const {close} = useContext(MenusContext);
   function handleClick() {
-    onClick?.();
+    // Prop za children u okviru Modal.Open je onClick: () => open(opensWindowName)  
+    onClick?.();    
     close();
   }
   return (
     <li>
+      {/* ovaj onClick nema veze sa prethodna dva onClick-a */}
       <StyledButton onClick={handleClick} {...props}>
         {icon}<span>{children}</span>
       </StyledButton>
