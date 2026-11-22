@@ -65,6 +65,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
       <FormRow label="Maximum capacity" error={errors?.maxCapacity?.message}>
         <Input type="number" id="maxCapacity" disabled={isWorking} {...register("maxCapacity", { 
           required: "This field is required", 
+          setValueAs: (value) => Number(value),
           min: {
             value: 1, 
             message: "Capacity must be at least 1"
@@ -76,6 +77,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
       <FormRow label="Regular price" error={errors?.regularPrice?.message}>
         <Input type="number" id="regularPrice" disabled={isWorking} {...register("regularPrice", { 
           required: "This field is required", 
+          setValueAs: (value) => Number(value),
           min: {
             value: 0,
             message: "Price must be at least 0"
